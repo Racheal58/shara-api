@@ -28,8 +28,7 @@
     "@adonisjs/session": "^1.0.27",
     "@adonisjs/shield": "^1.0.8",
     "adonis-smser": "^0.1.0",
-    "lucid-mongo": "3.1.2",
-    "mongoose": "^5.10.0",
+    "lucid-mongo": "^3.1.6",
     "twilio": "^3.49.1"
   },
   "devDependencies": {},
