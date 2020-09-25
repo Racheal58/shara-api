@@ -189,7 +189,6 @@ class OrderController {
     response,
   }) {
     const { quantity } = request.all();
-    console.log(quantity);
 
     const order = await Order.where("_id").eq(orderId).first();
 
