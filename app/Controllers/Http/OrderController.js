@@ -8,7 +8,7 @@ const Smser = use("Smser");
 class OrderController {
   async index({
     auth: {
-      user: { _id },
+      user: { _id, isAdmin },
     },
     request,
     response,
@@ -33,7 +33,14 @@ class OrderController {
       });
     }
 
-    const orders = await Order.all();
+    let orders = [];
+    if (isAdmin === "true" || isAdmin === true) {
+      orders = await Order.where({}).sort({ created_at: -1 }).fetch();
+    } else {
+      orders = await Order.where({ userId: _id })
+        .sort({ created_at: -1 })
+        .fetch();
+    }
     if (orders.toJSON().length === 0)
       return response
         .status(404)
@@ -182,7 +189,7 @@ class OrderController {
     response,
   }) {
     const { quantity } = request.all();
-    console.log(quantity)
+    console.log(quantity);
 
     const order = await Order.where("_id").eq(orderId).first();
 
@@ -278,52 +285,21 @@ class OrderController {
       });
     }
 
-    //
+    order.isCompleted = true;
+    await order.save();
 
     await Mail.send("emails.complete", { order }, (message) => {
       message
         .to(email)
-        .from("noreply@shara.com")
+        .from("no_reply@shara.com")
         .subject("Your order has been completed");
     });
 
-    // sms
-
-    // client.messages
-    //   .create({
-    //     body: buildMessage(),
-    //     from: Env.get("TWILIO_NUMBER"),
-    //     to: phone_number,
-    //   })
-    //   .then(message => console.log(message))
-    //   .catch(err => console.log(err));
-
-    // console.log(Env.get("TWILIO_NUMBER"));
     await Smser.send(
       `Dear ${first_name}, Your Order has been sucessfully completed. Please check your email for complete details.`,
       phone_number
     );
 
-    // await Smser.send("Test message", (message) => {
-    //   // message.from(Env.get("TWILIO_NUMBER"));
-    //   message.to("+2347018228593");
-    // });
-
-    // await Smser.send("Test message", (message) => {
-    //   console.log("message", message);
-    //   message.to("+2348153337028");
-    // });
-
-    // console.log("sms", sms);
-
-    //
-    /*
-     ** if error while sending email or sms return an error occured so they should try again
-     */
-
-    //
-    // order.isCompleted = true;
-    // await order.save()
     return response.status(200).json({
       message: "Successfully completed your order",
       order,

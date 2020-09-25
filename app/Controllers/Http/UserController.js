@@ -1,5 +1,7 @@
 "use strict";
 
+const Hash = use("Hash");
+
 const User = use("App/Models/User");
 class UserController {
   async index({ response }) {
@@ -30,6 +32,17 @@ class UserController {
 
     const user = await User.where("email").eq(email).first();
 
+    if (!user)
+      return response
+        .status(404)
+        .json({ message: "This account does not exist" });
+    const isSame = await Hash.verify(password, user.password);
+
+    if (!isSame)
+      return response
+        .status(401)
+        .json({ message: "Your password is not correct" });
+
     const { token } = await auth.generate(user, true);
     return response
       .status(201)
@@ -48,7 +61,7 @@ class UserController {
       }
 
       const user = await User.create({ ...userInfo, isAdmin: "false" });
-      const { token } = await auth.attempt(userInfo.email, userInfo.password);
+      const { token } = await auth.generate(user, true);
 
       return response.status(200).json({
         message: "Your account has been successfully created",
