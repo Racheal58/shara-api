@@ -16,7 +16,7 @@ class UserController {
   }
 
   async show({ auth, params, request, response }) {
-    if (auth.user.id !== Number(params.id)) {
+    if (auth.user._id.toString() !== params.id) {
       return response.status(403).json({
         message: "You cannot see someone else's profile",
       });
