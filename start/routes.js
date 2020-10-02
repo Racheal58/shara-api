@@ -35,11 +35,17 @@ Route.group("products", () => {
 }).prefix("/api/v1/products");
 
 Route.group("orders", () => {
-  Route.get("/", "OrderController.index");
+  Route.get("/", "OrderController.index").middleware(["auth"]);
   Route.get("/:id", "OrderController.show").middleware(["auth"]);
   Route.post("/addproduct", "OrderController.addProduct").middleware(["auth"]);
-  Route.delete("/:orderId/removeproduct/:productId", "OrderController.removeProduct").middleware(["auth"]);
-  Route.put("/:orderId/editproduct/:productId", "OrderController.editProduct").middleware(["auth"]);
+  Route.delete(
+    "/:orderId/removeproduct/:productId",
+    "OrderController.removeProduct"
+  ).middleware(["auth"]);
+  Route.put(
+    "/:orderId/editproduct/:productId",
+    "OrderController.editProduct"
+  ).middleware(["auth"]);
   Route.post("/complete/:id", "OrderController.complete");
   Route.delete("/:id", "OrderController.delete").middleware(["auth"]);
 }).prefix("/api/v1/orders");
